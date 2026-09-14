@@ -1,11 +1,13 @@
 
 package edu.utexas.cs.cs378;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class MainClient {
 
@@ -28,6 +30,8 @@ public class MainClient {
 			hostName = args[1];
 			portNumber = Integer.parseInt(args[2]);
 		}
+
+		
 
 		try {
 
@@ -84,5 +88,101 @@ public class MainClient {
 			e.printStackTrace();
 		}
 
+	}
+
+	public static class TaxiRecord {
+		public String medallion;
+		public String hackLicense;
+		public double totalAmount;
+
+		public TaxiRecord (String m, String h, double t) {
+			medallion = m;
+			hackLicense = h;
+			totalAmount = t;
+		}
+	}
+
+	public static class DriverStats {
+		public double totalEarnings = 0.0;
+		public HashSet<String> medallionSet = new HashSet<>();
+	}
+
+	public static TaxiRecord validate (String line) {
+		double fareAmount;
+		double surcharge;
+		double mtaTax;
+		double tipAmount;
+		double tollsAmount;
+		double totalAmount;
+		String[] split = line.split(",", -1);
+		if(split.length != 17) {
+			return null;
+		}
+		try {
+			fareAmount = Double.parseDouble(split[11]);
+        	surcharge = Double.parseDouble(split[12]);
+        	mtaTax = Double.parseDouble(split[13]);
+        	tipAmount = Double.parseDouble(split[14]);
+        	tollsAmount = Double.parseDouble(split[15]);
+        	totalAmount = Double.parseDouble(split[16]);
+		} 
+		catch (NumberFormatException e) {
+			return null;
+		}
+		String medallion = split[0].trim();
+		String hackLicense = split[1].trim();
+		if(medallion.isEmpty() || hackLicense.isEmpty()) {
+			return null;
+		}
+		double computedTotal = fareAmount + surcharge + mtaTax + tipAmount + tollsAmount;
+		if(Math.abs(computedTotal - totalAmount) > .01) {
+			return null;
+		}
+		if(totalAmount > 500) {
+			return null;
+		}
+		return new TaxiRecord(medallion, hackLicense, totalAmount);
+	}
+
+	public static HashMap<String, DriverStats> cleanAndTogether (String file) {
+		HashMap<String, DriverStats> result = new HashMap<>();
+		ArrayList<String> badLines = new ArrayList<>();
+		int rejectedLines = 0;
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String line = reader.readLine();
+			while (line != null) {
+				TaxiRecord record = validate(line);
+				if(record == null) {
+					rejectedLines++;
+					if(badLines.size() < 5) {
+						badLines.add(line);
+					}
+					line = reader.readLine();
+					continue;
+				}
+				if(!result.containsKey(record.hackLicense)) {
+					result.put(record.hackLicense, new DriverStats());
+				}
+				DriverStats stats = result.get(record.hackLicense);
+				stats.totalEarnings += record.totalAmount;
+				stats.medallionSet.add(record.medallion);
+				line = reader.readLine();
+			}
+
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Rejected lines: " + rejectedLines);
+		if (badLines.isEmpty()) {
+        	System.out.println("No erroneous lines found.");
+		} 
+		else {
+        	for (String bad : badLines) {
+            	System.out.println(bad);
+        	}
+    	}
+		return result;
 	}
 }
