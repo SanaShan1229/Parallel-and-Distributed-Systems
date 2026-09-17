@@ -17,7 +17,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class MainServer {
 
@@ -55,7 +57,7 @@ public class MainServer {
 			System.out.println("Server is hearing on port " + portNumber);
 			int hasData; 
 			
-			List<DataItem> allRecieved = new ArrayList<>();
+			PriorityQueue<DataItem> topKHeap = new PriorityQueue<>(10, Comparator.comparingDouble(DataItem::getTotalEarnings));
 			while(true) {
 				hasData = dis.readInt();
 				
@@ -76,10 +78,14 @@ public class MainServer {
 				List<DataItem> dataItems = Utils.readFromAPage(page) ;
 				
 				//TODO process the data here !
-				for (DataItem dataItem : dataItems) {
-					allRecieved.add(dataItem);
-
-					// You need to receive the data here and process it. 
+				for(DataItem dataItem : dataItems) {
+					if(topKHeap.size() < 10) {
+						topKHeap.add(dataItem);
+					} 
+					else if(dataItem.getTotalEarnings() > topKHeap.peek().getTotalEarnings()) {
+						topKHeap.poll();
+						topKHeap.add(dataItem);
+					}
 				}
 				
 				
@@ -91,7 +97,8 @@ public class MainServer {
 				dos.writeInt(1);
 				dos.flush();
 				
-				}else {
+				}
+				else {
 					System.out.println("Terminate beecause Flag is: " + hasData);
 					break; // break out of while true if we get no more data. 					
 				}
@@ -99,8 +106,8 @@ public class MainServer {
 				
 			}
 			// End of while true
-			Collections.sort(allRecieved, (a, b) -> Double.compare(b.getTotalEarnings(), a.getTotalEarnings()));
-			List<DataItem> topTen = allRecieved.subList(0, Math.min(10, allRecieved.size()));
+			List<DataItem> topTen = new ArrayList<>(topKHeap);
+			Collections.sort(topTen, (a, b) -> Double.compare(b.getTotalEarnings(), a.getTotalEarnings()));
 			for(int i = 0; i < topTen.size(); i++) {
 				DataItem item = topTen.get(i);
 				System.out.println("(" + item.getDriverId() + ", " + item.getMedallionCount() + ", " + item.getTotalEarnings() + ")");
