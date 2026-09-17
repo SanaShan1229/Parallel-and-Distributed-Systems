@@ -93,7 +93,7 @@ public class MainClient {
 					try {
 						// !TODO: We sleep here but you can do a lot more thing.s
 
-						//Thread.sleep(500);
+						Thread.sleep(500);
 						System.out.println("Waiting for the server ... ");
 					} catch (InterruptedException e) {
 
