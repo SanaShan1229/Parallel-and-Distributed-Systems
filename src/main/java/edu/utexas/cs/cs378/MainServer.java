@@ -71,7 +71,7 @@ public class MainServer {
 				dis.readFully(page);
 
 				//TODO: Remove the Sleep when you run your program. This is just for demo. 
-				//Thread.sleep(500);
+				Thread.sleep(500);
 				
 				List<DataItem> dataItems = Utils.readFromAPage(page) ;
 				
