@@ -1,3 +1,12 @@
+// 1. Student Name: Sanchana Shanmuga
+//    Student UT EID: ss229638
+
+// 2. Student Name: Victoria Reddy
+//    Student UT EID: vrr593
+//
+// ## Course Name: CS378
+// ## Unique Number: 12345
+// ## Date Created: 2026-09-13
 package edu.utexas.cs.cs378;
 
 public class Const {

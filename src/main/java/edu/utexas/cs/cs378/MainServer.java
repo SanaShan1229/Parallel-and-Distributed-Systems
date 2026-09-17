@@ -1,5 +1,13 @@
-package edu.utexas.cs.cs378;
+// 1. Student Name: Sanchana Shanmuga
+//    Student UT EID: ss229638
 
+// 2. Student Name: Victoria Reddy
+//    Student UT EID: vrr593
+//
+// ## Course Name: CS378
+// ## Unique Number: 12345
+// ## Date Created: 2026-09-13
+package edu.utexas.cs.cs378;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -7,6 +15,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MainServer {
@@ -16,7 +26,6 @@ public class MainServer {
 	/**
 	 * A main method to run examples.
 	 *
-	 * @param args not used
 	 */
 	public static void main(String[] args) {
 
@@ -46,7 +55,7 @@ public class MainServer {
 			System.out.println("Server is hearing on port " + portNumber);
 			int hasData; 
 			
-			
+			List<DataItem> allRecieved = new ArrayList<>();
 			while(true) {
 				hasData = dis.readInt();
 				
@@ -62,16 +71,16 @@ public class MainServer {
 				dis.readFully(page);
 
 				//TODO: Remove the Sleep when you run your program. This is just for demo. 
-				Thread.sleep(500);
+				//Thread.sleep(500);
 				
 				List<DataItem> dataItems = Utils.readFromAPage(page) ;
 				
 				//TODO process the data here !
-//				for (DataItem dataItem : dataItems) {
-//					// We just print it to the stdout
-//					// You need to receive the data here and process it. 
-//						System.out.println(dataItem);
-//				}
+				for (DataItem dataItem : dataItems) {
+					allRecieved.add(dataItem);
+
+					// You need to receive the data here and process it. 
+				}
 				
 				
 				System.out.println("Number of Objects received:" + dataItems.size());
@@ -88,7 +97,14 @@ public class MainServer {
 				}
 				
 				
-			}// End of while true
+			}
+			// End of while true
+			Collections.sort(allRecieved, (a, b) -> Double.compare(b.getTotalEarnings(), a.getTotalEarnings()));
+			List<DataItem> topTen = allRecieved.subList(0, Math.min(10, allRecieved.size()));
+			for(int i = 0; i < topTen.size(); i++) {
+				DataItem item = topTen.get(i);
+				System.out.println("(" + item.getDriverId() + ", " + item.getMedallionCount() + ", " + item.getTotalEarnings() + ")");
+			}
 
 
 

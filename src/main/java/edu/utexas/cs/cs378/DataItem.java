@@ -1,5 +1,13 @@
-package edu.utexas.cs.cs378;
+// 1. Student Name: Sanchana Shanmuga
+//    Student UT EID: ss229638
 
+// 2. Student Name: Victoria Reddy
+//    Student UT EID: vrr593
+//
+// ## Course Name: CS378
+// ## Unique Number: 12345
+// ## Date Created: 2026-09-13
+package edu.utexas.cs.cs378;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -11,43 +19,43 @@ import java.nio.charset.Charset;
  */
 public class DataItem {
 
-	private String line;
-	private float valueA;
-	private float valueB;
+	private String driverId;
+	private int medallionCount;
+	private double totalEarnings;
 
 	public DataItem() {
 
 	}
 
-	public DataItem(String line, float valueA, float valueB) {
+	public DataItem(String driverId, int medallionCount, double totalEarnings) {
 		super();
-		this.line = line;
-		this.valueA = valueA;
-		this.valueB = valueB;
+		this.driverId = driverId;
+		this.medallionCount = medallionCount;
+		this.totalEarnings = totalEarnings;
 	}
 
-	public String getLine() {
-		return line;
+	public String getDriverId() {
+		return driverId;
 	}
 
-	public void setLine(String line) {
-		this.line = line;
+	public void setDriverId(String driverId) {
+		this.driverId = driverId;
 	}
 
-	public float getValueA() {
-		return valueA;
+	public int getMedallionCount() {
+		return medallionCount;
 	}
 
-	public void setValueA(float valueA) {
-		this.valueA = valueA;
+	public void setMedallionCount(int medallionCount) {
+		this.medallionCount = medallionCount;
 	}
 
-	public float getValueB() {
-		return valueB;
+	public double getTotalEarnings() {
+		return totalEarnings;
 	}
 
-	public void setValueB(float valueB) {
-		this.valueB = valueB;
+	public void setTotalEarnings(double totalEarnings) {
+		this.totalEarnings = totalEarnings;
 	}
 
 	/**
@@ -59,25 +67,25 @@ public class DataItem {
 	 */
 	public byte[] handSerializationWithByteBuffer() {
 
-		byte[] lineBytes = line.getBytes(Charset.forName("UTF-8"));
+		byte[] driverIdBytes = driverId.getBytes(Charset.forName("UTF-8"));
 		// 8 bytes for each float number (two float numbers 16)
 		// 4 byte for an integer to write the length of the string
 		// lineBytes.length for the legth of the string.
 
-		ByteBuffer byteBuffer = ByteBuffer.allocate(2 * 8 + 4 + lineBytes.length);
+		ByteBuffer byteBuffer = ByteBuffer.allocate(4 + driverIdBytes.length + 4 + 8);
 
-		// 1. String line
+		// 1. driverId
 		// First length of it and then its bytes
 		// Each string value might be of different size. We have to write down its
 		// length.
-		byteBuffer.putInt(lineBytes.length);
-		byteBuffer.put(lineBytes);
+		byteBuffer.putInt(driverIdBytes.length);
+		byteBuffer.put(driverIdBytes);
 
-		// 2. ValueA
-		byteBuffer.putFloat(valueA);
+		// 2. medallion
+		byteBuffer.putInt(medallionCount);
 
-		// 2. ValueA
-		byteBuffer.putFloat(valueA);
+		// 2. totalEarnings
+		byteBuffer.putDouble(totalEarnings);
 
 		return byteBuffer.array();
 	}
@@ -99,12 +107,12 @@ public class DataItem {
 		String tmpLine = extractString(byteBuffer, stringSize);
 
 		// 2. read a float from the given byte array
-		float valueATemp = byteBuffer.getFloat();
+		int valueMedallionCount = byteBuffer.getInt();
 
 		// 3. read the last float byte array back.
-		float valueBTemp = byteBuffer.getFloat();
+		double valueTotalEarnings = byteBuffer.getDouble();
 
-		return new DataItem(tmpLine, valueATemp, valueBTemp);
+		return new DataItem(tmpLine, valueMedallionCount, valueTotalEarnings);
 
 	}
 
@@ -125,7 +133,7 @@ public class DataItem {
 
 	@Override
 	public String toString() {
-		return "DataItem [line=" + line + ", valueA=" + valueA + ", valueB=" + valueB + "]";
+		return "DataItem [driverId=" + driverId + ", medallionCount=" + medallionCount + ", totalEarnings=" + totalEarnings + "]";
 	}
 
 }

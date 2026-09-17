@@ -1,19 +1,29 @@
+// 1. Student Name: Sanchana Shanmuga
+//    Student UT EID: ss229638
 
+// 2. Student Name: Victoria Reddy
+//    Student UT EID: vrr593
+//
+// ## Course Name: CS378
+// ## Unique Number: 12345
+// ## Date Created: 2026-09-13
 package edu.utexas.cs.cs378;
-
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class MainClient {
 
 	static public int portNumber = 33333;
 	static public String hostName = "localhost";
-
 	static public int batchSize = 4000;
 	private static Socket mySocket;
 
@@ -24,16 +34,30 @@ public class MainClient {
 	 */
 	public static void main(String[] args) {
 
-		if (args.length > 2) {
-			System.err.println("Usage: MainClient <BatchSize> <hostname> <port number> ");
-			batchSize = Integer.parseInt(args[0]);
-			hostName = args[1];
-			portNumber = Integer.parseInt(args[2]);
-		}
+		String dataFile = "taxi-data-sorted-small.csv";
+
+       
+        if(args.length >= 3) {
+            batchSize = Integer.parseInt(args[0]);
+            hostName = args[1];
+            portNumber = Integer.parseInt(args[2]);
+        } 
+		else if(args.length > 0) {
+            System.err.println("Usage: MainClient    [dataFile]");
+            return;
+        }
+
+        if(args.length >= 4) {
+            dataFile = args[3];
+        }
 
 		
 
 		try {
+			System.out.println("Reading and cleaning dataset: " + dataFile);
+			HashMap<String, DriverStats> map = cleanAndTogether(dataFile);
+			List<DataItem> dataItems = convertItems(map);
+			
 
 			mySocket = new Socket(hostName, portNumber);
 			System.out.println("Waiting for client connection ... ");
@@ -47,8 +71,7 @@ public class MainClient {
 			// 2. Pre-process your data, map it for example to other forms
 			// 3. Send it to the server like the following.
 
-			List<DataItem> dataItems = Utils.generateExampleData(batchSize);
-
+			
 			List<byte[]> pages = Utils.packageToPages(dataItems);
 
 			// Then we send the pages over to the server.
@@ -70,7 +93,7 @@ public class MainClient {
 					try {
 						// !TODO: We sleep here but you can do a lot more thing.s
 
-						Thread.sleep(500);
+						//Thread.sleep(500);
 						System.out.println("Waiting for the server ... ");
 					} catch (InterruptedException e) {
 
@@ -135,7 +158,7 @@ public class MainClient {
 			return null;
 		}
 		double computedTotal = fareAmount + surcharge + mtaTax + tipAmount + tollsAmount;
-		if(Math.abs(computedTotal - totalAmount) > .01) {
+		if(Math.abs(computedTotal - totalAmount) > .0101) {
 			return null;
 		}
 		if(totalAmount > 500) {
@@ -183,6 +206,20 @@ public class MainClient {
             	System.out.println(bad);
         	}
     	}
+		return result;
+	}
+
+	public static List<DataItem> convertItems(HashMap<String, DriverStats> map) {
+		List<DataItem> result = new ArrayList<>();
+		for (Map.Entry<String, DriverStats> entry : map.entrySet()) {
+			String driverId = entry.getKey();
+			DriverStats stats = entry.getValue();
+			int medallionCount = stats.medallionSet.size();
+			double totalEarnings = stats.totalEarnings;
+
+			DataItem item = new DataItem(driverId, medallionCount, totalEarnings);
+			result.add(item);
+		}
 		return result;
 	}
 }
