@@ -7,11 +7,6 @@ A Java-based client/server application built for CS378: Cloud Computing. The pro
 - Sanchana Shanmuga — ss229638
 - Victoria Reddy — vrr593
 
-## Course
-
-- CS378 - Cloud Computing
-- Unique Number: 51515
-
 ## Project Overview
 
 This project simulates a distributed data-processing workflow:
