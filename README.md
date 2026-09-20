@@ -1,6 +1,6 @@
 # Parallel and Distributed Systems Project
 
-A Java-based distributed data processing project built for CS378: Cloud Computing. The system reads a large taxi dataset, validates and cleans the records, sends data in fixed-size network pages, and computes the top earning drivers on the server side using a streaming aggregation approach.
+A Java-based distributed client/server system that processes large datasets by coordinating communication, validation, and efficient data handling across components. This project demonstrates experience with networking, serialization, distributed computation, and scalable system design.
 
 ## Team
 
