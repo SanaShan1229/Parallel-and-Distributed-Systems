@@ -4,8 +4,8 @@ A Java-based client/server application built for CS378: Cloud Computing. The pro
 
 ## Team
 
-- Sanchana Shanmuga — ss229638
-- Victoria Reddy — vrr593
+- Sanchana Shanmuga
+- Victoria Reddy
 
 ## Project Overview
 
